@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "langchains"
+version = "0.1.0"
+description = ""
+authors = ["Dhavaleswar <93dhavaleshwar@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.13,<4.0"
+openai = "^1.82.1"
+langchain = "^0.3.25"
+langchain-community = "^0.3.24"
+tiktoken = "^0.9.0"
+pandas = "^2.2.3"
+docarray = "^0.41.0"
+langchain-experimental = "^0.3.4"
+numexpr = "^2.10.2"
+wikipedia = "^1.4.0"
+datetime = "^5.5"
+
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "^1.1.1"
+nbstripout = "^0.8.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

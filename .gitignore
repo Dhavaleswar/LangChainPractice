@@ -1,0 +1,10 @@
+.idea/
+*.ipynb_checkpoints/
+# Jupyter Notebook checkpoints
+__pycache__/
+# virtual environment
+*.venv/
+*venv/
+
+# ignore cache
+.cache/
