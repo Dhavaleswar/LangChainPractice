@@ -17,6 +17,12 @@ langchain-experimental = "^0.3.4"
 numexpr = "^2.10.2"
 wikipedia = "^1.4.0"
 datetime = "^5.5"
+langgraph = "^0.4.8"
+langchain-openai = "^0.3.27"
+tavily-python = "^0.7.8"
+duckduckgo-search = "^8.0.4"
+langgraph-checkpoint = "^2.1.0"
+langgraph-checkpoint-sqlite = "^2.0.10"
 
 
 [tool.poetry.group.dev.dependencies]
