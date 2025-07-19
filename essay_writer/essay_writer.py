@@ -1,11 +1,11 @@
 from utils.helpers import set_api_keys_env
+
 set_api_keys_env()
 
 from langgraph.graph import StateGraph, END
-from typing import TypedDict, Annotated, List
-import operator
+from typing import TypedDict, List
 from langgraph.checkpoint.memory import InMemorySaver
-from langchain_core.messages import AnyMessage, SystemMessage, HumanMessage, ToolMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from tavily import TavilyClient
 from langchain_core.pydantic_v1 import BaseModel
@@ -14,13 +14,14 @@ from rich.markdown import Markdown
 
 
 class AgentState(TypedDict):
-    task: str # This is the human input
-    plan: str # Key to keep track of plan, planning agent will generate
-    draft: str # draft of the essay
-    critique: str # critique of the draft, critique agent
-    content: List[str] # list of document that tavily has researched
-    revision_number: int # number of revisions made to the draft
-    max_revision: int # maximum number of revisions allowed
+    task: str  # This is the human input
+    plan: str  # Key to keep track of plan, planning agent will generate
+    draft: str  # draft of the essay
+    critique: str  # critique of the draft, critique agent
+    content: List[str]  # list of document that tavily has researched
+    revision_number: int  # number of revisions made to the draft
+    max_revision: int  # maximum number of revisions allowed
+
 
 class Queries(BaseModel):
     queries: List[str]
@@ -53,6 +54,7 @@ RESEARCH_CRITIQUE_PROMPT = """You are a researcher charged with providing inform
 be used when making any requested revisions (as outlined below). \
 Generate a list of search queries that will gather any releavant information. Only generate 3 queries max."""
 
+
 def plan_node(state: AgentState):
     messages = [
         SystemMessage(content=PLAN_PROMPT),
@@ -62,7 +64,7 @@ def plan_node(state: AgentState):
     return {"plan": response.content}
 
 
-def research_plan_node(state:AgentState):
+def research_plan_node(state: AgentState):
     queries = model.with_structured_output(Queries).invoke([
         SystemMessage(content=RESEARCH_PLAN_PROMPT),
         HumanMessage(content=state["task"]),
@@ -75,9 +77,9 @@ def research_plan_node(state:AgentState):
     return {"content": content}
 
 
-def generate_node(state:AgentState):
+def generate_node(state: AgentState):
     content = "\n\n".join(state.get('content', []))
-    user_message = HumanMessage(content = f"{state['task']}\n\nHere is my plan:\n\n{state['plan']}")
+    user_message = HumanMessage(content=f"{state['task']}\n\nHere is my plan:\n\n{state['plan']}")
     messages = [
         SystemMessage(
             content=WRITER_PROMPT.format(content=content)
@@ -86,7 +88,7 @@ def generate_node(state:AgentState):
     ]
     resoponse = model.invoke(messages)
     return {
-        "draft": resoponse.content, 
+        "draft": resoponse.content,
         "revision_number": state.get("revision_number", 1) + 1
     }
 
@@ -123,7 +125,7 @@ tavily = TavilyClient()
 inmem1 = InMemorySaver()
 
 # Create the state graph and add nodes
-builder= StateGraph(AgentState)
+builder = StateGraph(AgentState)
 
 # define the nodes
 builder.add_node("planner", plan_node)
@@ -139,12 +141,12 @@ builder.set_entry_point("planner")
 builder.add_conditional_edges(
     "generate",
     should_continue,
-    {END:END, "reflect": "reflect"}
+    {END: END, "reflect": "reflect"}
 )
 builder.add_edge("planner", "research_plan")
 builder.add_edge("research_plan", "generate")
 
-builder.add_edge("reflect",  "research_critique")
+builder.add_edge("reflect", "research_critique")
 builder.add_edge("research_critique", "generate")
 
 # compile the graph
@@ -164,3 +166,5 @@ if __name__ == "__main__":
     console.print("# Essay Draft", style="bold underline")
     console.print(Markdown(s['generate']['draft']))
 
+# git command to change remote url oring
+# git remote set-url origin

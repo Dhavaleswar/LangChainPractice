@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "langchains"
+name = "explore-agents"
 version = "0.1.0"
 description = ""
 authors = ["Dhavaleswar <93dhavaleshwar@gmail.com>"]
